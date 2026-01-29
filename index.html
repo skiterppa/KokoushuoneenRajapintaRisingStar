@@ -61,16 +61,13 @@
         .calendar-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; }
         .calendar-controls { display: flex; justify-content: space-between; margin-bottom: 15px; }
 
-        /* 
-           STRICT GRID ALIGNMENT CSS 
-           Using 60px height for rows to match calculations perfectly
-        */
+        /* Grid Layout */
         .schedule-grid {
             display: grid;
             /* Time column (60px) + 7 Days */
             grid-template-columns: 60px repeat(7, 1fr); 
             border: 1px solid var(--grid-line-color);
-            min-width: 700px; /* Ensure it doesn't squish too much */
+            min-width: 700px; 
         }
 
         /* Header Row */
@@ -91,7 +88,7 @@
             border-bottom: 1px solid var(--grid-line-color);
             display: flex; align-items: flex-start; justify-content: center;
             font-size: 0.75em; color: #666;
-            padding-top: 2px; /* Slight offset to align text with line */
+            padding-top: 2px; 
         }
 
         /* Day Columns */
@@ -100,9 +97,9 @@
             border-right: 1px solid var(--grid-line-color);
             height: 600px; /* 10 hours * 60px */
             
-            /* CSS Gradient to draw lines exactly every 30px (half hour) */
+            /* CSS Gradient to draw lines every 30px (half hour) */
             background-image: linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
-            background-size: 100% 30px; /* Repeats every 30px */
+            background-size: 100% 30px; 
         }
 
         /* Weekend styling */
@@ -306,10 +303,20 @@
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('welcome-msg').innerText = `Welcome, ${this.currentUser.username}`;
                 
-                // Set default date to today
-                const today = new Date().toISOString().split("T")[0];
-                document.getElementById('book-date').setAttribute('min', today);
-                document.getElementById('book-date').value = today;
+                // --- DATE PICKER SETUP ---
+                const dateInput = document.getElementById('book-date');
+                
+                // 1. Min Date: Today
+                const today = new Date();
+                const todayStr = today.toISOString().split("T")[0];
+                dateInput.setAttribute('min', todayStr);
+                dateInput.value = todayStr;
+
+                // 2. Max Date: Today + 6 days (7 days total range)
+                const maxDate = new Date();
+                maxDate.setDate(today.getDate() + 6); 
+                const maxStr = maxDate.toISOString().split("T")[0];
+                dateInput.setAttribute('max', maxStr);
 
                 this.renderCalendar();
                 this.renderMyList();
@@ -343,6 +350,23 @@
 
                 const startDt = new Date(`${dateStr}T${startTime}`);
                 const endDt = new Date(`${dateStr}T${endTime}`);
+
+                // --- VALIDATIONS ---
+
+                // 1. Check Date Range (Must be within 7 days)
+                const todayMidnight = new Date();
+                todayMidnight.setHours(0,0,0,0);
+                
+                // Limit is 8 days from now (to be strictly safe against time offsets)
+                // Actually, strict 7 days logic:
+                const diffTime = startDt.getTime() - todayMidnight.getTime();
+                const diffDays = diffTime / (1000 * 3600 * 24);
+                
+                // View shows Day 0 to Day 6. Day 7 is outside view.
+                if (diffDays >= 7) { 
+                    msgDiv.innerText = "Cannot book more than 7 days ahead."; 
+                    return; 
+                }
 
                 if (startDt >= endDt) { msgDiv.innerText = "End time must be after start."; return; }
                 const diffMins = (endDt - startDt) / 60000;
@@ -422,7 +446,6 @@
                 }
 
                 // 2. Clear previous Day Columns (keep the time column which is first child)
-                // We remove all children except the first one (time-column-labels)
                 while (bodyContainer.children.length > 1) {
                     bodyContainer.removeChild(bodyContainer.lastChild);
                 }
