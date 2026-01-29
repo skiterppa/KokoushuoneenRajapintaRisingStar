@@ -11,13 +11,17 @@
             --danger: #e74c3c;
             --light: #ecf0f1;
             --success: #27ae60;
+            --grid-line-color: #e0e0e0;
+            --cell-height: 60px; /* 1 hour height */
         }
+
+        * { box-sizing: border-box; }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
         
         /* Utils */
         .hidden { display: none !important; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; } /* Wider for 7 days */
         button { cursor: pointer; padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; }
         .btn-primary { background-color: var(--accent); color: white; }
         .btn-danger { background-color: var(--danger); color: white; }
@@ -40,50 +44,80 @@
         
         .dashboard-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-top: 20px; }
 
-        /* Sidebar & List */
-        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        /* New Style for the Selected Room indicator */
+        /* Sidebar */
+        .sidebar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: fit-content; }
         .room-indicator {
-            background-color: var(--light);
-            border-left: 5px solid var(--accent);
-            padding: 10px;
-            margin-bottom: 15px;
+            background-color: var(--light); border-left: 5px solid var(--accent);
+            padding: 10px; margin-bottom: 15px;
         }
-
         .my-reservations ul { list-style: none; padding: 0; }
         .my-reservations li { 
             background: var(--light); padding: 10px; margin-bottom: 10px; border-radius: 4px;
-            border-left: 4px solid var(--primary); position: relative;
+            border-left: 4px solid var(--primary); position: relative; font-size: 0.9em;
         }
         .delete-btn { font-size: 0.8em; background: var(--danger); color: white; border: none; padding: 2px 6px; float: right; }
 
         /* Calendar View */
-        .calendar-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .calendar-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; }
         .calendar-controls { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        
-        /* Visual Grid for Calendar */
+
+        /* 
+           STRICT GRID ALIGNMENT CSS 
+           Using 60px height for rows to match calculations perfectly
+        */
         .schedule-grid {
             display: grid;
-            grid-template-columns: 50px repeat(5, 1fr); /* Time col + 5 days */
-            border-top: 1px solid #ddd;
-            border-left: 1px solid #ddd;
+            /* Time column (60px) + 7 Days */
+            grid-template-columns: 60px repeat(7, 1fr); 
+            border: 1px solid var(--grid-line-color);
+            min-width: 700px; /* Ensure it doesn't squish too much */
         }
-        .grid-header { background: var(--primary); color: white; padding: 10px; text-align: center; font-weight: bold; }
-        .grid-time-label { border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; padding: 5px; font-size: 0.8em; text-align: right; background: #fafafa; }
-        
-        /* The cells representing days */
-        .day-column { border-right: 1px solid #ddd; position: relative; height: 600px; background: repeating-linear-gradient(to bottom, transparent 0 29px, #eee 29px 30px); }
-        
-        /* Booking Block Visuals */
+
+        /* Header Row */
+        .grid-header {
+            background: var(--primary); color: white; padding: 10px 2px;
+            text-align: center; font-weight: bold; font-size: 0.85em;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Time Labels (Left Column) */
+        .time-column {
+            background: #fafafa;
+            border-right: 1px solid var(--grid-line-color);
+        }
+        .time-slot {
+            height: var(--cell-height); /* 60px */
+            border-bottom: 1px solid var(--grid-line-color);
+            display: flex; align-items: flex-start; justify-content: center;
+            font-size: 0.75em; color: #666;
+            padding-top: 2px; /* Slight offset to align text with line */
+        }
+
+        /* Day Columns */
+        .day-column {
+            position: relative;
+            border-right: 1px solid var(--grid-line-color);
+            height: 600px; /* 10 hours * 60px */
+            
+            /* CSS Gradient to draw lines exactly every 30px (half hour) */
+            background-image: linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
+            background-size: 100% 30px; /* Repeats every 30px */
+        }
+
+        /* Weekend styling */
+        .day-column.weekend { background-color: #f9f9f9; background-image: linear-gradient(to bottom, #e0e0e0 1px, transparent 1px); }
+
+        /* Booking Block */
         .booking-block {
-            position: absolute; width: 90%; left: 5%;
+            position: absolute; width: 94%; left: 3%;
             background-color: var(--success); color: white;
-            border-radius: 4px; font-size: 0.75em; padding: 2px;
+            border-radius: 4px; font-size: 0.7em; padding: 2px;
             overflow: hidden; text-align: center; box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-            z-index: 10;
+            z-index: 10; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center;
         }
-        .booking-block.booked-by-other { background-color: var(--primary); }
+        .booking-block.booked-by-other { background-color: var(--primary); opacity: 0.9; }
+
     </style>
 </head>
 <body>
@@ -113,41 +147,36 @@
             <!-- LEFT: Calendar -->
             <div class="calendar-section">
                 <div class="calendar-controls">
-                    <h3>Room Schedule (Mon-Fri)</h3>
-                    <!-- MAIN DROPDOWN: Controls Calendar AND Booking Form -->
+                    <h3>7-Day Schedule</h3>
                     <select id="room-selector" onchange="App.renderCalendar()">
                         <option value="room1">Room 1 (Conference)</option>
                         <option value="room2">Room 2 (Huddle)</option>
                     </select>
                 </div>
                 
-                <!-- Headers: Time + Mon Tue Wed Thu Fri -->
-                <div class="schedule-grid" id="calendar-header">
-                    <div class="grid-header">Time</div>
-                    <div class="grid-header">Mon</div>
-                    <div class="grid-header">Tue</div>
-                    <div class="grid-header">Wed</div>
-                    <div class="grid-header">Thu</div>
-                    <div class="grid-header">Fri</div>
-                </div>
-                <!-- Body: Time Labels + 5 Columns -->
+                <!-- HEADER ROW (Generated by JS) -->
+                <div class="schedule-grid" id="calendar-header"></div>
+                
+                <!-- BODY ROW -->
                 <div class="schedule-grid" id="calendar-body">
-                    <!-- JS generates this -->
+                    <!-- Time Column -->
+                    <div class="time-column" id="time-column-labels"></div>
+                    <!-- 7 Day Columns generated by JS -->
                 </div>
+                
                 <p style="font-size: 0.8em; color: #666; margin-top:5px;">*Hours: 08:00 - 18:00. Grid lines represent 30 mins.</p>
             </div>
 
-            <!-- RIGHT: Booking Controls & List -->
+            <!-- RIGHT: Booking Controls -->
             <div class="sidebar">
                 <h3>Reserve a Room</h3>
                 
-                <!-- CHANGED: No dropdown here, just text indicating selection -->
                 <div class="room-indicator">
                     <small>Currently Booking:</small><br>
-                    <strong id="sidebar-room-name" style="color:var(--accent); font-size:1.1em;">Room 1 (Conference)</strong>
+                    <strong id="sidebar-room-name" style="color:var(--accent); font-size:1.1em;">Room 1</strong>
                 </div>
 
-                <label>Date (Next 7 days)</label>
+                <label>Date</label>
                 <input type="date" id="book-date" style="width:93%">
 
                 <div style="display:flex; gap:5px;">
@@ -168,115 +197,79 @@
 
                 <h3>My Reservations</h3>
                 <div class="my-reservations">
-                    <ul id="my-res-list">
-                        <!-- List Items Here -->
-                    </ul>
+                    <ul id="my-res-list"></ul>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        /**
-         * 1. MOCK API LAYER
-         * Simulates a backend with a database using LocalStorage
-         */
+        // --- 1. MOCK API ---
         const MockAPI = {
             users: [
                 { id: 1, username: 'user1', password: '123456' },
                 { id: 2, username: 'user2', password: '123456' }
             ],
-
-            // Initialize DB if empty
             initDB: function() {
                 if (!localStorage.getItem('reservations')) {
                     localStorage.setItem('reservations', JSON.stringify([]));
                 }
             },
-
             login: function(username, password) {
                 return new Promise((resolve, reject) => {
                     const user = this.users.find(u => u.username === username && u.password === password);
-                    if (user) resolve(user);
-                    else reject("Invalid credentials");
+                    if (user) resolve(user); else reject("Invalid credentials");
                 });
             },
-
             getReservations: function() {
                 return JSON.parse(localStorage.getItem('reservations')) || [];
             },
-
             addReservation: function(reservation) {
                 const all = this.getReservations();
-                
-                // VALIDATIONS
                 const newStart = new Date(reservation.start).getTime();
                 const newEnd = new Date(reservation.end).getTime();
                 const now = new Date().getTime();
 
-                // 1. Check past
-                if (newStart < now) {
-                    return { success: false, msg: "Cannot reserve in the past." };
-                }
+                // Validation 1: Past
+                if (newStart < now) return { success: false, msg: "Cannot reserve in the past." };
 
-                // 2. Check overlap for specific room
+                // Validation 2: Overlap
                 const hasOverlap = all.some(r => {
                     if (r.roomId !== reservation.roomId) return false;
                     const rStart = new Date(r.start).getTime();
                     const rEnd = new Date(r.end).getTime();
-                    // Overlap logic: (StartA < EndB) and (EndA > StartB)
                     return (newStart < rEnd && newEnd > rStart);
                 });
+                if (hasOverlap) return { success: false, msg: "Time slot already taken." };
 
-                if (hasOverlap) {
-                    return { success: false, msg: "Room is already booked for this time." };
-                }
-
-                reservation.id = Date.now(); // Simple ID generation
+                reservation.id = Date.now();
                 all.push(reservation);
                 localStorage.setItem('reservations', JSON.stringify(all));
                 return { success: true };
             },
-
             deleteReservation: function(id, userId) {
                 let all = this.getReservations();
                 const target = all.find(r => r.id === id);
-                
                 if (!target) return { success: false, msg: "Not found" };
                 if (target.userId !== userId) return { success: false, msg: "Unauthorized" };
-
                 all = all.filter(r => r.id !== id);
                 localStorage.setItem('reservations', JSON.stringify(all));
                 return { success: true };
             }
         };
 
-        /**
-         * 2. APPLICATION LOGIC
-         * Handles DOM, State, and UI Events
-         */
+        // --- 2. APP LOGIC ---
         const App = {
             currentUser: null,
-            weekStart: null, // Monday of current week
+            viewStartDate: null, // This will be Today
 
             init: function() {
                 MockAPI.initDB();
                 this.generateTimeOptions();
-                this.setWeekStart();
+                this.viewStartDate = new Date(); // Start from Today
                 this.checkSession();
             },
 
-            setWeekStart: function() {
-                // Find current Monday
-                const d = new Date();
-                const day = d.getDay(); 
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-                const monday = new Date(d.setDate(diff));
-                monday.setHours(0,0,0,0);
-                this.weekStart = monday;
-            },
-
-            // --- Auth Handling ---
             checkSession: function() {
                 const savedUser = sessionStorage.getItem('currentUser');
                 if (savedUser) {
@@ -288,16 +281,15 @@
             login: async function() {
                 const u = document.getElementById('username').value;
                 const p = document.getElementById('password').value;
-                const errDiv = document.getElementById('login-error');
-
+                const err = document.getElementById('login-error');
                 try {
                     const user = await MockAPI.login(u, p);
                     this.currentUser = user;
                     sessionStorage.setItem('currentUser', JSON.stringify(user));
-                    errDiv.innerText = "";
+                    err.innerText = "";
                     this.showDashboard();
-                } catch (err) {
-                    errDiv.innerText = err;
+                } catch (e) {
+                    err.innerText = e;
                 }
             },
 
@@ -306,17 +298,14 @@
                 sessionStorage.removeItem('currentUser');
                 document.getElementById('app-screen').classList.add('hidden');
                 document.getElementById('login-screen').classList.remove('hidden');
-                document.getElementById('username').value = "";
-                document.getElementById('password').value = "";
             },
 
-            // --- View Logic ---
             showDashboard: function() {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('welcome-msg').innerText = `Welcome, ${this.currentUser.username}`;
                 
-                // Set Date Picker Min to today
+                // Set default date to today
                 const today = new Date().toISOString().split("T")[0];
                 document.getElementById('book-date').setAttribute('min', today);
                 document.getElementById('book-date').value = today;
@@ -328,8 +317,7 @@
             generateTimeOptions: function() {
                 const startSel = document.getElementById('book-start');
                 const endSel = document.getElementById('book-end');
-                
-                // 08:00 to 18:00 in 30 min steps
+                // 08:00 to 18:00
                 for (let i = 8; i <= 18; i++) {
                     let hour = i < 10 ? '0' + i : i;
                     if (i !== 18) startSel.innerHTML += `<option value="${hour}:00">${hour}:00</option>`;
@@ -341,7 +329,6 @@
                 }
             },
 
-            // --- Booking Logic ---
             makeReservation: function() {
                 const roomId = document.getElementById('room-selector').value;
                 const dateStr = document.getElementById('book-date').value;
@@ -353,26 +340,18 @@
                     msgDiv.innerText = "Please fill all fields."; return;
                 }
 
-                // Construct Date Objects
                 const startDt = new Date(`${dateStr}T${startTime}`);
                 const endDt = new Date(`${dateStr}T${endTime}`);
 
-                // Client Validations
-                if (startDt >= endDt) {
-                    msgDiv.innerText = "End time must be after start time."; return;
-                }
+                if (startDt >= endDt) { msgDiv.innerText = "End time must be after start."; return; }
                 const diffMins = (endDt - startDt) / 60000;
-                if (diffMins < 30) {
-                    msgDiv.innerText = "Minimum reservation is 30 minutes."; return;
-                }
-                // Check if weekend
-                const day = startDt.getDay();
-                if (day === 0 || day === 6) {
-                    msgDiv.innerText = "Reservations allowed Mon-Fri only."; return;
-                }
+                if (diffMins < 30) { msgDiv.innerText = "Min 30 minutes required."; return; }
 
-                // Call Mock API
-                const result = MockAPI.addReservation({
+                // Check Weekend
+                const day = startDt.getDay();
+                if (day === 0 || day === 6) { msgDiv.innerText = "No weekends allowed."; return; }
+
+                const res = MockAPI.addReservation({
                     userId: this.currentUser.id,
                     userName: this.currentUser.username,
                     roomId: roomId,
@@ -380,124 +359,140 @@
                     end: endDt.toISOString()
                 });
 
-                if (result.success) {
+                if (res.success) {
                     msgDiv.style.color = "green";
-                    msgDiv.innerText = "Booked successfully!";
-                    setTimeout(() => msgDiv.innerText = "", 3000);
+                    msgDiv.innerText = "Booked!";
+                    setTimeout(()=>msgDiv.innerText="", 3000);
                     this.renderCalendar();
                     this.renderMyList();
                 } else {
                     msgDiv.style.color = "var(--danger)";
-                    msgDiv.innerText = result.msg;
+                    msgDiv.innerText = res.msg;
                 }
             },
 
             deleteRes: function(id) {
-                if(confirm("Are you sure you want to delete this reservation?")) {
+                if(confirm("Delete this reservation?")) {
                     const res = MockAPI.deleteReservation(id, this.currentUser.id);
                     if(res.success) {
                         this.renderCalendar();
                         this.renderMyList();
-                    } else {
-                        alert(res.msg);
                     }
                 }
             },
 
-            // --- Rendering ---
             renderMyList: function() {
                 const list = document.getElementById('my-res-list');
                 const all = MockAPI.getReservations();
                 const mine = all.filter(r => r.userId === this.currentUser.id)
                                 .sort((a,b) => new Date(a.start) - new Date(b.start));
-
+                
                 list.innerHTML = "";
-                if(mine.length === 0) {
-                    list.innerHTML = "<li style='background:transparent; border:none'>No reservations found.</li>";
-                    return;
-                }
+                if(mine.length === 0) { list.innerHTML = "<li>No reservations.</li>"; return; }
 
                 mine.forEach(r => {
                     const s = new Date(r.start);
                     const e = new Date(r.end);
-                    const dateStr = s.toLocaleDateString();
-                    const timeStr = `${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')} - ${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}`;
+                    const roomName = r.roomId === 'room1' ? 'Room 1' : 'Room 2';
+                    const timeStr = `${s.toLocaleDateString()} ${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')}-${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}`;
                     
                     const li = document.createElement('li');
-                    li.innerHTML = `
-                        <strong>${r.roomId === 'room1' ? 'Room 1' : 'Room 2'}</strong><br>
-                        ${dateStr} <br> ${timeStr}
-                        <button class="delete-btn" onclick="App.deleteRes(${r.id})">Delete</button>
-                    `;
+                    li.innerHTML = `<strong>${roomName}</strong><br>${timeStr} <button class="delete-btn" onclick="App.deleteRes(${r.id})">X</button>`;
                     list.appendChild(li);
                 });
             },
 
             renderCalendar: function() {
-                // Get Selected Room and Text
                 const selector = document.getElementById('room-selector');
                 const selectedRoomId = selector.value;
-                const selectedRoomName = selector.options[selector.selectedIndex].text;
+                document.getElementById('sidebar-room-name').innerText = selector.options[selector.selectedIndex].text;
 
-                document.getElementById('sidebar-room-name').innerText = selectedRoomName;
+                const headerRow = document.getElementById('calendar-header');
+                const bodyContainer = document.getElementById('calendar-body');
+                const timeCol = document.getElementById('time-column-labels');
 
-                // Standard Rendering Logic
-                const container = document.getElementById('calendar-body');
-                container.innerHTML = "";
-
-                // Time Labels
-                const timeCol = document.createElement('div');
+                // 1. Render Time Labels (Only once or clear and re-add)
+                timeCol.innerHTML = "";
                 for(let i=8; i<18; i++) {
-                    const div = document.createElement('div');
-                    div.className = 'grid-time-label';
-                    div.style.height = '60px';
-                    div.innerText = `${i}:00`;
-                    timeCol.appendChild(div);
+                    const slot = document.createElement('div');
+                    slot.className = 'time-slot';
+                    slot.innerText = `${i}:00`;
+                    timeCol.appendChild(slot);
                 }
-                container.appendChild(timeCol);
 
-                // 2. Render 5 Days (Mon-Fri)
-                const allReservations = MockAPI.getReservations();            
-                // Helper: Get dates for Mon-Fri of current week
-                for (let i = 0; i < 5; i++) {
-                    const currentDayDate = new Date(this.weekStart);
-                    currentDayDate.setDate(this.weekStart.getDate() + i);
+                // 2. Clear previous Day Columns (keep the time column which is first child)
+                // We remove all children except the first one (time-column-labels)
+                while (bodyContainer.children.length > 1) {
+                    bodyContainer.removeChild(bodyContainer.lastChild);
+                }
+
+                // 3. Clear Header
+                headerRow.innerHTML = '<div class="grid-header">Time</div>';
+
+                // 4. Generate 7 Days from Today
+                const allReservations = MockAPI.getReservations();
+                const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+                for(let i=0; i<7; i++) {
+                    const currentDayDate = new Date(this.viewStartDate);
+                    currentDayDate.setDate(this.viewStartDate.getDate() + i);
                     
+                    const dayName = days[currentDayDate.getDay()];
+                    const dayDateStr = `${currentDayDate.getDate()}/${currentDayDate.getMonth()+1}`;
+                    const isWeekend = (currentDayDate.getDay() === 0 || currentDayDate.getDay() === 6);
+
+                    // Add Header Cell
+                    const th = document.createElement('div');
+                    th.className = 'grid-header';
+                    th.innerHTML = `${dayName} <br> ${dayDateStr}`;
+                    headerRow.appendChild(th);
+
+                    // Add Body Column
                     const col = document.createElement('div');
                     col.className = 'day-column';
-                    // Filter reservations for this room and this specific day
+                    if(isWeekend) col.classList.add('weekend');
+
+                    // Filter Bookings for this Day & Room
                     const daysRes = allReservations.filter(r => {
                         if(r.roomId !== selectedRoomId) return false;
                         const rDate = new Date(r.start);
                         return rDate.toDateString() === currentDayDate.toDateString();
                     });
 
-                    // Render Blocks
+                    // Render Bookings
                     daysRes.forEach(r => {
                         const start = new Date(r.start);
                         const end = new Date(r.end);
-                        // Calculate position
-                        // Start hour is 8. So 8:00 is 0px.
-                        const startHour = start.getHours();
-                        const startMin = start.getMinutes();
-                        const endHour = end.getHours();
-                        const endMin = end.getMinutes();
-
-                        const top = ((startHour - 8) * 60) + startMin;
-                        const durationMins = ((endHour - startHour) * 60) + (endMin - startMin);
                         
+                        // PIXEL MATH: 
+                        // Row height = 60px per hour. Start hour 8:00.
+                        const startH = start.getHours();
+                        const startM = start.getMinutes();
+                        const endH = end.getHours();
+                        const endM = end.getMinutes();
+
+                        // (Hour - 8) * 60 + Minutes
+                        const top = ((startH - 8) * 60) + startM;
+                        // Duration in minutes = height in pixels (since 1hr = 60mins = 60px)
+                        const duration = ((endH - startH) * 60) + (endM - startM);
+
                         const div = document.createElement('div');
                         div.className = 'booking-block';
                         if (r.userId !== this.currentUser.id) div.classList.add('booked-by-other');
+                        
                         div.style.top = top + 'px';
-                        div.style.height = durationMins + 'px';
-                        div.innerHTML = `<strong>Booked</strong><br>${r.userName}`;
+                        div.style.height = duration + 'px';
+                        div.innerHTML = `<strong>${r.userName}</strong>`;
+                        div.title = `${startH}:${startM} - ${endH}:${endM}`; // Tooltip
+
                         col.appendChild(div);
                     });
-                    container.appendChild(col);
+
+                    bodyContainer.appendChild(col);
                 }
             }
         };
+
         App.init();
 
     </script>
