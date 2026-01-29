@@ -1,5 +1,5 @@
 # Promptit
-## Eka tehtävä
+## 1. Tehtävä
 ### Käyttäjä
 Make script with JavaScirpt and use Mock API for reserving a room.
 Don't download any packages just use what javascript offers if possible
@@ -560,3 +560,54 @@ Prevents overlapping bookings.
 Login Screen.
 Visual Calendar Grid (showing "Booked" and Name).
 List of own reservations with Delete button.
+
+## 2. Tehtävä
+### Käyttäjä
+Lets make some changes. 
+First thing is that there are two dropdown menus and I would need only one.
+Keep the dropdown menu above calendar and remove from "Reserve a room column" but leave there some text that updates when changes the dropdown meu
+
+### Gemini-3-pro
+Here is the updated script.
+
+Changes made:
+
+Removed the "Room" dropdown from the right-hand sidebar.
+Added a display area in the sidebar that shows which room is currently selected.
+Linked the logic: When you change the dropdown above the Calendar (left side), it updates the Calendar view AND updates the text in the sidebar so you know which room you are booking.
+Save this as index.html.
+
+- Tässä olisi HTML koodi mutta ne muutokset näkyy commiteissa --> "Päivitetty index.html dorpdownmenu"
+
+### Käyttäjä
+Looks great but there is small problem. I want the calendar show 7 days from this day because today is the first day you can book the room. Even the time is outside of the limit but use still same day as today.
+Also the grid what shows the reservation doesn't match the times.
+
+### Gemini-3-pro
+Here is the updated script.
+
+Key Changes:
+
+7-Day View Starting Today: The calendar logic now calculates new Date() (Today) as the start point and loops for 7 days.
+Grid Alignment Fix: I rewrote the CSS for the calendar grid.
+I enforced box-sizing: border-box to ensure padding/borders don't break pixel math.
+I matched the Time Labels height exactly with the Background Grid Lines using CSS gradients.
+I increased the grid loop to 7 columns (previously 5).
+Weekend Handling: Since we show 7 days from today, weekends might appear. I added a visual check: if a column is a Saturday or Sunday, it gets a gray background, and the "Book" button will block reservations on those days (per your rules).
+Save this as index.html.
+
+- Tässä olisi HTML koodi mutta ne muutokset näkyy commitissa --> "Kalenterin päivitys"
+
+### Käyttäjä
+I found a bug in code. I can book the room over this 7 days what I told to do, so add one check so I can only book rooms for the next 7 days
+
+### Gemini-3-pro
+I have updated the code to fix this bug.
+
+Changes made:
+
+Javascript Validation: Added a check in makeReservation to calculate if the selected date is more than 7 days from today. If it is, it stops the booking and shows an error.
+UI Restriction: I updated the showDashboard function to automatically set the max attribute on the Date Picker input. Now, the calendar dropdown won't even let the user select a date outside the 7-day window.
+Save this as index.html.
+
+- Tässä olisi HTML koodi mutta ne muutokset näkyy commitissa --> "Varauksen teko max 7 päivää eteenpäin"
